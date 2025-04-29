@@ -1,6 +1,7 @@
 package org.platkmframework.dsl;
 
 import org.platkmframework.dsl.action.FlowActionCond;
+import org.platkmframework.dsl.action.FlowActionParallelStep;
 import org.platkmframework.dsl.action.FlowControlAction;
 
 import java.util.UUID;
@@ -28,6 +29,20 @@ public class FlowDefinitionWhenStep<T, I> {
     public FlowDefinitionWhenStep<T, I> step(String id, String label, FlowStep<T> flowStep){
         flowControlAction.add(id, label, flowStep);
         return this;
+    }
+
+    public FlowDefinitionParallel<T, FlowDefinitionWhenStep<T, I>> parallel(){
+        return parallel(UUID.randomUUID().toString());
+    }
+
+    public FlowDefinitionParallel<T, FlowDefinitionWhenStep<T, I>> parallel(String id){
+        return parallel(id, null);
+    }
+
+    public FlowDefinitionParallel<T, FlowDefinitionWhenStep<T, I>> parallel(String id, String label){
+        FlowActionParallelStep<T> flowActionParallelStep = new FlowActionParallelStep<T>(id, label);
+        flowControlAction.add(id, label, flowActionParallelStep);
+        return new FlowDefinitionParallel<>(flowActionParallelStep, this);
     }
 
     public FlowDefinitionWhenStep<T, I> whenElse(String id, Predicate<T> cond){

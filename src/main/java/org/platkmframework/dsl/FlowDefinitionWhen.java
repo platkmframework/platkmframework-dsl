@@ -1,5 +1,6 @@
 package org.platkmframework.dsl;
 
+import org.platkmframework.dsl.action.FlowActionParallelStep;
 import org.platkmframework.dsl.action.FlowControlAction;
 
 import java.util.UUID;
@@ -28,15 +29,18 @@ public class FlowDefinitionWhen<T, I> {
         return new FlowDefinitionWhenStep<>(flowControlAction,  parent);
     }
 
-
-    /**  public T jump(String id, String stepId){
-
-        //searching for flowaction  in flows and add again in flows
-        FlowActionStep flowAction = flows.stream().filter(f->f.g);
-        flows.add(new FlowActionStep(id, flowStep));
-        return new FlowDefinitionWhenStepJump<T>(parent);
+    public FlowDefinitionParallel<T, FlowDefinitionWhen<T,I>> parallel(){
+        return parallel(UUID.randomUUID().toString());
     }
-*/
 
+    public FlowDefinitionParallel<T, FlowDefinitionWhen<T,I>>  parallel(String id){
+        return parallel(id, null);
+    }
+
+    public FlowDefinitionParallel<T, FlowDefinitionWhen<T,I>> parallel(String id, String label){
+        FlowActionParallelStep<T> flowActionParallelStep = new FlowActionParallelStep<T>(id, label);
+        flowControlAction.add(id, label, flowActionParallelStep);
+        return new FlowDefinitionParallel<>(flowActionParallelStep, this);
+    }
 
 }

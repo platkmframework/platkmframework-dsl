@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
@@ -37,18 +38,18 @@ public class FlowDefinition<T> {
         return this;
     }
 
-    public FlowDefinition<T> parallel(FlowStep<T>... steps){
-        flows.add(new FlowActionParallelStep<T>(steps));
-        return this;
+    public FlowDefinitionParallel<T, FlowDefinition<T>> parallel(){
+        return parallel(UUID.randomUUID().toString());
     }
 
-    public FlowDefinition<T> parallel(String id, FlowStep<T>... steps){
-        return parallel(id, id, steps);
+    public FlowDefinitionParallel<T, FlowDefinition<T>> parallel(String id){
+        return parallel(id, null);
     }
 
-    public FlowDefinition<T> parallel(String id, String label, FlowStep<T>... steps){
-        flows.add(new FlowActionParallelStep<T>(id, label, steps));
-        return this;
+    public FlowDefinitionParallel<T, FlowDefinition<T>> parallel(String id, String label){
+        FlowActionParallelStep<T> flowActionParallelStep = new FlowActionParallelStep<T>(id, label);
+        flows.add(flowActionParallelStep);
+        return new FlowDefinitionParallel<>(flowActionParallelStep, this);
     }
 
     public FlowDefinitionWhen<T,FlowDefinition<T>> when(Predicate<T>  cond){
@@ -68,8 +69,6 @@ public class FlowDefinition<T> {
         flows.add(flowControlAction);
         return new FlowDefinitionWhen<>(flowControlAction, this);
     }
-
-
 
     public void run(T data) {
         for(FlowAction<T> flowAction: flows){

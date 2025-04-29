@@ -39,6 +39,10 @@ public class FlowActionCond<T>  extends FlowAction<T>  {
         flows.add(new FlowActionStep<>(id, label, flowStep));
     }
 
+    public void add(FlowActionParallelStep<T> flowActionParallelStep){
+        flows.add(flowActionParallelStep);
+    }
+
     public void add(FlowControlAction<T> whenflowControlAction){
         flows.add(whenflowControlAction);
     }

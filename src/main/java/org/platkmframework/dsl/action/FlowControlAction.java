@@ -54,6 +54,10 @@ public class FlowControlAction<T> extends FlowAction<T>{
         conditions.get(conditions.size()-1).add(id, label, flowStep);
     }
 
+    public void add(String id, String label,  FlowActionParallelStep<T> flowActionParallelStep) {
+        conditions.get(conditions.size()-1).add(flowActionParallelStep);
+    }
+
     public void add(FlowControlAction<T> whenflowControlAction) {
         conditions.get(conditions.size()-1).add(whenflowControlAction);
     }

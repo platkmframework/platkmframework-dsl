@@ -8,16 +8,15 @@ import java.util.concurrent.CompletableFuture;
 
 public class FlowActionParallelStep<T>  extends FlowAction<T> {
 
-    private final FlowStep<T>[] steps;
+    private final List<FlowStep<T>> steps;
 
-    public FlowActionParallelStep(FlowStep<T>[] steps) {
-        super();
-        this.steps = steps;
+    public FlowActionParallelStep(String id, String label) {
+        super(id, label);
+        this.steps = new ArrayList<>();
     }
 
-    public FlowActionParallelStep(String id, String label,  FlowStep<T>[] steps) {
-        super(id, label);
-        this.steps = steps;
+    public void add(String id, String label, FlowStep<T> step) {
+        this.steps.add(step);
     }
 
     @Override
