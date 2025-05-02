@@ -1,4 +1,4 @@
-package org.platkmframework.dsl;
+package org.platkmframework.dsl.steps;
 
 public interface FlowStep <T>{
 

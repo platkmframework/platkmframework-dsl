@@ -1,6 +1,6 @@
 package org.platkmframework.dsl.action;
 
-import org.platkmframework.dsl.FlowStep;
+import org.platkmframework.dsl.steps.FlowStep;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,14 +8,14 @@ import java.util.concurrent.CompletableFuture;
 
 public class FlowActionParallelStep<T>  extends FlowAction<T> {
 
-    private final List<FlowStep<T>> steps;
+    private final List<FlowStep <T>> steps;
 
     public FlowActionParallelStep(String id, String label) {
         super(id, label);
         this.steps = new ArrayList<>();
     }
 
-    public void add(String id, String label, FlowStep<T> step) {
+    public void add(FlowStep<T> step) {
         this.steps.add(step);
     }
 

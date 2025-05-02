@@ -1,6 +1,6 @@
 package org.platkmframework.dsl.action;
 
-import org.platkmframework.dsl.FlowStep;
+import org.platkmframework.dsl.steps.FlowStep;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,14 +33,7 @@ public class FlowControlAction<T> extends FlowAction<T>{
         return flowActionCond;
     }
 
-    @Override
-    public boolean process(T data) {
-        for (FlowActionCond<T> flowActionCond: conditions){
-            if(flowActionCond.process(data))
-                break;
-        }
-        return true;
-    }
+
 
     public void add(FlowStep<T> flowStep) {
         conditions.get(conditions.size()-1).add(flowStep);
@@ -60,5 +53,14 @@ public class FlowControlAction<T> extends FlowAction<T>{
 
     public void add(FlowControlAction<T> whenflowControlAction) {
         conditions.get(conditions.size()-1).add(whenflowControlAction);
+    }
+
+    @Override
+    public boolean process(T data) {
+        for (FlowActionCond<T> flowActionCond : conditions) {
+            flowActionCond.process(data);
+        }
+        return true;
+
     }
 }

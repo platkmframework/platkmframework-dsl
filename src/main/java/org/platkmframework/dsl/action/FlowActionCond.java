@@ -1,6 +1,6 @@
 package org.platkmframework.dsl.action;
 
-import org.platkmframework.dsl.FlowStep;
+import org.platkmframework.dsl.steps.FlowStep;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,8 @@
-package org.platkmframework.dsl;
+package org.platkmframework.dsl.definition;
 
 import org.platkmframework.dsl.action.FlowActionParallelStep;
 import org.platkmframework.dsl.action.FlowControlAction;
+import org.platkmframework.dsl.steps.FlowStep;
 
 import java.util.UUID;
 
@@ -20,8 +21,7 @@ public class FlowDefinitionWhen<T, I> {
     }
 
     public FlowDefinitionWhenStep<T, I> step(String id, FlowStep<T> flowStep){
-        flowControlAction.add(id, flowStep);
-        return new FlowDefinitionWhenStep<>(flowControlAction,  parent);
+        return step(id, null, flowStep);
     }
 
     public FlowDefinitionWhenStep<T, I> step(String id, String label, FlowStep<T> flowStep){
@@ -29,18 +29,24 @@ public class FlowDefinitionWhen<T, I> {
         return new FlowDefinitionWhenStep<>(flowControlAction,  parent);
     }
 
-    public FlowDefinitionParallel<T, FlowDefinitionWhen<T,I>> parallel(){
+    @SafeVarargs
+    public final FlowDefinitionWhenStep<T, I> parallel(FlowStep<T>... flowSteps){
         return parallel(UUID.randomUUID().toString());
     }
 
-    public FlowDefinitionParallel<T, FlowDefinitionWhen<T,I>>  parallel(String id){
-        return parallel(id, null);
+    @SafeVarargs
+    public final FlowDefinitionWhenStep<T, I>  parallel(String id, FlowStep<T>... flowSteps){
+        return parallel(id, flowSteps);
     }
 
-    public FlowDefinitionParallel<T, FlowDefinitionWhen<T,I>> parallel(String id, String label){
+    @SafeVarargs
+    public final FlowDefinitionWhenStep<T, I> parallel(String id, String label, FlowStep<T>... flowSteps){
         FlowActionParallelStep<T> flowActionParallelStep = new FlowActionParallelStep<T>(id, label);
+        for (FlowStep<T> flowStep: flowSteps){
+            flowActionParallelStep.add(flowStep);
+        }
         flowControlAction.add(id, label, flowActionParallelStep);
-        return new FlowDefinitionParallel<>(flowActionParallelStep, this);
+        return new FlowDefinitionWhenStep<>(flowControlAction,  parent);
     }
 
 }
