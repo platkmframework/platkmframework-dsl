@@ -31,12 +31,12 @@ public class FlowDefinitionWhen<T, I> {
 
     @SafeVarargs
     public final FlowDefinitionWhenStep<T, I> parallel(FlowStep<T>... flowSteps){
-        return parallel(UUID.randomUUID().toString());
+        return parallel(UUID.randomUUID().toString(), flowSteps);
     }
 
     @SafeVarargs
     public final FlowDefinitionWhenStep<T, I>  parallel(String id, FlowStep<T>... flowSteps){
-        return parallel(id, flowSteps);
+        return parallel(id, null, flowSteps);
     }
 
     @SafeVarargs

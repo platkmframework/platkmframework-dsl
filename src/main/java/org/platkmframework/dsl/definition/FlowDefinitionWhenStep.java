@@ -30,12 +30,12 @@ public class FlowDefinitionWhenStep<T, I> {
         return this;
     }
 
-    public FlowDefinitionWhenStep<T, I> parallel(){
-        return parallel(UUID.randomUUID().toString());
+    public FlowDefinitionWhenStep<T, I> parallel(FlowStep<T>... flowSteps){
+        return parallel(UUID.randomUUID().toString(), flowSteps);
     }
 
-    public FlowDefinitionWhenStep<T, I> parallel(String id){
-        return parallel(id, null);
+    public FlowDefinitionWhenStep<T, I> parallel(String id, FlowStep<T>... flowSteps){
+        return parallel(id, null, flowSteps);
     }
 
     @SafeVarargs
@@ -59,6 +59,14 @@ public class FlowDefinitionWhenStep<T, I> {
     public FlowDefinitionWhen<T,I> whenElse(String id, String label, Predicate<T> cond){
         this.flowControlAction.addCondition(id, label, cond);
         return  new FlowDefinitionWhen<>(this.flowControlAction, parent);
+    }
+
+    public FlowDefinitionWhen<T,FlowDefinitionWhenStep<T,I>> when(Predicate<T>  cond){
+        return when(UUID.randomUUID().toString(), cond);
+    }
+
+    public FlowDefinitionWhen<T,FlowDefinitionWhenStep<T,I>> when(String id, Predicate<T>  cond){
+        return when(id, null, cond);
     }
 
     public FlowDefinitionWhen<T,FlowDefinitionWhenStep<T,I>> when(String id, String label, Predicate<T>  cond){

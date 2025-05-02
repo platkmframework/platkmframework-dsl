@@ -8,15 +8,6 @@ public class FlowActionStep<T>  extends FlowAction<T> {
 
     private final FlowStep<T>flowStep;
 
-    public FlowActionStep(FlowStep<T> flowStep) {
-        this(UUID.randomUUID().toString(), flowStep);
-    }
-
-    public FlowActionStep(String id, FlowStep<T> flowStep) {
-        super(id,id);
-        this.flowStep = flowStep;
-    }
-
     public FlowActionStep(String id, String label, FlowStep<T> flowStep) {
         super(id, label);
         this.flowStep = flowStep;
