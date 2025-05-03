@@ -16,7 +16,7 @@ public class FlowControlAction<T> extends FlowAction<T>{
     }
 
     public FlowActionCond<T> addCondition(String id, String label, Predicate<T> cond){
-        FlowActionCond<T> flowActionCond =  new FlowActionCond<T>(id, label, cond);
+        FlowActionCond<T> flowActionCond =  new FlowActionCond<>(id, label, cond);
         this.conditions.add(flowActionCond);
         return flowActionCond;
     }
@@ -25,7 +25,7 @@ public class FlowControlAction<T> extends FlowAction<T>{
         conditions.get(conditions.size()-1).add(id, label, flowStep);
     }
 
-    public void add(String id, String label,  FlowActionParallelStep<T> flowActionParallelStep) {
+    public void add(FlowActionParallelStep<T> flowActionParallelStep) {
         conditions.get(conditions.size()-1).add(flowActionParallelStep);
     }
 
@@ -34,11 +34,9 @@ public class FlowControlAction<T> extends FlowAction<T>{
     }
 
     @Override
-    public boolean process(T data) {
+    public void process(T data) {
         for (FlowActionCond<T> flowActionCond : conditions) {
             flowActionCond.process(data);
         }
-        return true;
-
     }
 }

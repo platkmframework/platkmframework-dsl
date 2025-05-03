@@ -20,12 +20,11 @@ public class FlowActionParallelStep<T>  extends FlowAction<T> {
     }
 
     @Override
-    public boolean process(T data) {
+    public void process(T data) {
         List<CompletableFuture<Void>> futures = new ArrayList<>();
         for (FlowStep<T> step : steps) {
             futures.add(CompletableFuture.runAsync(() -> step.process(data)));
         }
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-        return true;
     }
 }

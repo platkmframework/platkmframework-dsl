@@ -31,13 +31,11 @@ public class FlowActionCond<T>  extends FlowAction<T>  {
     }
 
     @Override
-    public  boolean process(T data) {
+    public void process(T data) {
         if(cond.test(data)){
             for(FlowAction<T> flowAction: flows){
                 flowAction.process(data);
             }
-            return true;
-        }else
-            return false;
+        }
     }
 }

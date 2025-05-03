@@ -2,8 +2,6 @@ package org.platkmframework.dsl.action;
 
 import org.platkmframework.dsl.steps.FlowStep;
 
-import java.util.UUID;
-
 public class FlowActionStep<T>  extends FlowAction<T> {
 
     private final FlowStep<T>flowStep;
@@ -14,7 +12,9 @@ public class FlowActionStep<T>  extends FlowAction<T> {
     }
 
     @Override
-    public boolean process(T data) {
-        return flowStep.process(data);
+    public void process(T data) {
+        flowStep.process(data);
     }
+
+
 }
