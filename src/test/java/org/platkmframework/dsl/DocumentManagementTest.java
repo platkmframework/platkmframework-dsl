@@ -1,7 +1,9 @@
 package org.platkmframework.dsl;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.platkmframework.dsl.builder.FlowDefinitionBuilder;
 import org.platkmframework.dsl.context.FlowDefinitionContext;
 import org.platkmframework.dsl.runner.FlowDefinitionRunner;
@@ -9,10 +11,13 @@ import org.platkmframework.dsl.steps.FlowStep;
 
 import java.util.List;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DocumentManagementTest {
 
-    @Test
-    void documentManagementTest(){
+    FlowDefinitionRunner<Document> fdRunner;
+
+    @BeforeAll
+    void  init(){
 
         List<FlowStep<Document>> list  = List.of(
                 new ValidateFormat(),
@@ -24,24 +29,28 @@ class DocumentManagementTest {
                 new Index(),
                 new GeneratePreview(),
                 new FinalizeProcessing()
-                );
+        );
 
         FlowDefinitionContext<Document> context = new FlowDefinitionContext<>(list);
-        FlowDefinitionRunner<Document> fdRunner = FlowDefinitionBuilder.
+        fdRunner = FlowDefinitionBuilder.
                 builder(context).
-                step(ValidateFormat.class).
-                step(ORCExtraction.class).
-                step(ValidateMetaData.class).
-                when(document -> document.isValid).
-                    step(SaveToDB.class).
-                    parallel(Index.class, GeneratePreview.class).
-                whenElse(document -> !document.isValid).
-                    step(NotifyOperator.class).
-                    step(MoveToReviewFolder.class).
-                    parallel(Index.class, GeneratePreview.class).
-                end().
-                step(FinalizeProcessing.class).
+                    step(ValidateFormat.class).
+                    step(ORCExtraction.class).
+                    step(ValidateMetaData.class).
+                    when(document -> document.isValid).
+                        step(SaveToDB.class).
+                        parallel(Index.class, GeneratePreview.class).
+                    whenElse(document -> !document.isValid).
+                        step(NotifyOperator.class).
+                        step(MoveToReviewFolder.class).
+                        parallel(Index.class, GeneratePreview.class).
+                    end().
+                    step(FinalizeProcessing.class).
                 build();
+    }
+
+    @Test
+    void documentMetaDataValidatedTest(){
 
         Document document = new Document();
         document.isValid = Boolean.TRUE;
@@ -56,7 +65,23 @@ class DocumentManagementTest {
         Assertions.assertThat(document.finalizeProcessing).isTrue();
         Assertions.assertThat(document.notifyOperator).isFalse();
         Assertions.assertThat(document.moveToReviewFolder).isFalse();
+    }
 
+    @Test
+    void documentMetaDataNotValidatedTest(){
+
+        Document document = new Document();
+        fdRunner.run(document);
+
+        Assertions.assertThat(document.validateFormat).isTrue();
+        Assertions.assertThat(document.ocrExtraction).isTrue();
+        Assertions.assertThat(document.validateMetaData).isTrue();
+        Assertions.assertThat(document.saveToDB).isFalse();
+        Assertions.assertThat(document.index).isTrue();
+        Assertions.assertThat(document.generatePreview).isTrue();
+        Assertions.assertThat(document.finalizeProcessing).isTrue();
+        Assertions.assertThat(document.notifyOperator).isTrue();
+        Assertions.assertThat(document.moveToReviewFolder).isTrue();
     }
 
     static class Document {

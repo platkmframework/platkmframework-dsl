@@ -1,7 +1,9 @@
 package org.platkmframework.dsl;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.platkmframework.dsl.builder.FlowDefinitionBuilder;
 import org.platkmframework.dsl.context.FlowDefinitionContext;
 import org.platkmframework.dsl.runner.FlowDefinitionRunner;
@@ -9,11 +11,14 @@ import org.platkmframework.dsl.steps.FlowStep;
 
 import java.util.List;
 
- class FinanceReportTest {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+ class FinanceReportGenerationTest {
 
 
-    @Test
-    void financeReport(){
+    FlowDefinitionRunner<Report> fdRunner;
+
+    @BeforeAll
+    void  init(){
 
         List<FlowStep<Report>> list  = List.of(
                 new  FetchSales(),
@@ -24,13 +29,19 @@ import java.util.List;
                 new SendReportEmail());
 
         FlowDefinitionContext<Report> context = new FlowDefinitionContext<>(list);
-        FlowDefinitionRunner<Report> fdRunner = FlowDefinitionBuilder.
+         fdRunner = FlowDefinitionBuilder.
                 builder(context).
-                parallel(FetchSales.class, FetchExpenses.class, FetchTaxes.class).
-                step(MergeReportData.class).
-                step(GeneratePDF.class).
-                step(SendReportEmail.class).
+                    parallel(FetchSales.class, FetchExpenses.class, FetchTaxes.class).
+                    step(MergeReportData.class).
+                    step(GeneratePDF.class).
+                    step(SendReportEmail.class).
                 build();
+
+    }
+
+
+    @Test
+    void financeReport(){
 
         Report report = new Report();
         fdRunner.run(report);

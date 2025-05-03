@@ -1,7 +1,9 @@
 package org.platkmframework.dsl;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.platkmframework.dsl.builder.FlowDefinitionBuilder;
 import org.platkmframework.dsl.context.FlowDefinitionContext;
 import org.platkmframework.dsl.runner.FlowDefinitionRunner;
@@ -9,12 +11,13 @@ import org.platkmframework.dsl.steps.FlowStep;
 
 import java.util.List;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AuthenticationMFATest {
 
+    FlowDefinitionRunner<Credential> fdRunner;
 
-    @Test
-    void authenticationMFATest(){
-
+    @BeforeAll
+    void  init(){
         List<FlowStep<Credential>> list  = List.of(
                 new  SendMfaCode(),
                 new ValidateMfaCode(),
@@ -22,16 +25,21 @@ class AuthenticationMFATest {
                 new LoginSuccess());
 
         FlowDefinitionContext<Credential> context = new FlowDefinitionContext<>(list);
-        FlowDefinitionRunner<Credential> fdRunner = FlowDefinitionBuilder.
+        fdRunner = FlowDefinitionBuilder.
                 builder(context).
                     when(credential -> credential.requiredMFA).
                         step(SendMfaCode.class).
                         step(ValidateMfaCode.class).
                         step(LoginSuccess.class).
-                    whenElse(credential -> credential.requiredMFA).
+                    whenElse(credential -> !credential.requiredMFA).
+                        step(SkipMfaStep.class).
                         step(LoginSuccess.class).
                     end().
                 build();
+    }
+
+    @Test
+    void authenticationWithMFATest(){
 
         Credential credential = new Credential();
         credential.requiredMFA = true;
@@ -41,6 +49,19 @@ class AuthenticationMFATest {
         Assertions.assertThat(credential.mfaCodeValidated).isTrue();
         Assertions.assertThat(credential.loginSuccess).isTrue();
         Assertions.assertThat(credential.mfaSkip).isFalse();
+
+    }
+
+    @Test
+    void authenticationWithOutMFATest(){
+
+        Credential credential = new Credential();
+        fdRunner.run(credential);
+
+        Assertions.assertThat(credential.mfaCodeSent).isFalse();
+        Assertions.assertThat(credential.mfaCodeValidated).isFalse();
+        Assertions.assertThat(credential.loginSuccess).isTrue();
+        Assertions.assertThat(credential.mfaSkip).isTrue();
 
     }
 
