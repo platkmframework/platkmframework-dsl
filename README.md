@@ -53,6 +53,26 @@ Parallel:
          GeneratePDF
                 ↓
         SendReportEmail
+        
+        List<FlowStep<Report>> list  = List.of(
+                new  FetchSales(),
+                new FetchExpenses(),
+                new FetchTaxes(),
+                new MergeReportData(),
+                new GeneratePDF(),
+                new SendReportEmail());
+
+        FlowDefinitionContext<Report> context = new FlowDefinitionContext<>(list);
+        FlowDefinitionRunner<Report> fdRunner = FlowDefinitionBuilder.
+                builder(context).
+                parallel(FetchSales.class, FetchExpenses.class, FetchTaxes.class).
+                step(MergeReportData.class).
+                step(GeneratePDF.class).
+                step(SendReportEmail.class).
+                build();
+
+        Report report = new Report();
+        fdRunner.run(report);
 ```
 
 ## Autenticacion Mfa
