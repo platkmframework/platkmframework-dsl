@@ -1,31 +1,93 @@
 # platkmframework-dsl
 
-DSL significa Domain-Specific Language (Lenguaje Específico de Dominio).
+Domain-Specific Language (DSL).
 
-```
-    FlowDefinition<String> p = new FlowDefinition<String>().
-            step(new FlowStepTest("Init Process")).
-            when(msg -> msg.contains("PENDING_DATA")).
-                step(new FlowStepTest("Process data")).
-                when( msg ->Boolean.TRUE).
-                    step( new FlowStepTest("Send Email")).
-                whenEnd().
-            whenElse(msg -> Boolean.TRUE).
-                step(new FlowStepTest("Notify data not found"))
-            .whenEnd();
-    p.run("PENDING_DATA")
+## Registro Cliente Bancario
+
+```plaintext
+         ValidateCustomer
+               ↓
+         VerifyIdentity
+               ↓
+        ┌──── isVerified ────┐
+        ↓                   ↓
+    SaveCustomer       NotifyAnalyst
+        +                      
+Parallel:                          
+ - SendWelcomeEmail             
+ - IssueCard                    
+        ↓
+    (fin)
 ```
 
-```
-    FlowDefinition<String> p = new FlowDefinition<String>().
-            parallel("searchingStoreInfo",new FlowStepTest("Search Info store 1"), new FlowStepTest("Search Info store 2")).
-            when("exists data", msg -> msg.contains("DATA")).
-                step("processData", new FlowStepTest("Process data")).
-            whenElse("NOT exists data", msg -> !msg.contains("DATA")).
-                step("notify", new FlowStepTest("Notify data not found"))
-            .whenEnd();
+## Checkout Ecommerce
 
-    p.run("DATA");
+```plaintext
+           ValidateCart
+                 ↓
+            CheckStock
+                 ↓
+        ┌── isStockAvailable ──┐
+        ↓                     ↓
+  Parallel:               NotifyOutOfStock
+   - ReserveInventory      +     
+   - ProcessPayment     CancelCart
+        ↓
+     GenerateOrder
+        ↓
+       (fin)
 ```
+
+## Reporte Financiero
+
+```plaintext
+      ValidateReportRequest
+                ↓
+        Parallel:
+         - FetchSales
+         - FetchExpenses
+         - FetchTaxes
+                ↓
+        MergeReportData
+                ↓
+         GeneratePDF
+                ↓
+        SendReportEmail
+```
+
+## Autenticacion Mfa
+
+```plaintext
+     ValidateCredentials
+               ↓
+       ┌─ requiresMfa ─┐
+       ↓              ↓
+SendMfaCode      SkipMfaStep
+      ↓               ↓
+ValidateMfaCode      (salto)
+       ↓              ↓
+    LoginSuccess ←────┘
+```
+
+## Gestion Documental
+
+```plaintext
+           ValidateFormat
+                 ↓
+          OCR Extraction
+                 ↓
+        Validate Metadata
+                 ↓
+        ┌────── isValid ──────┐
+        ↓                    ↓
+   SaveToDB              NotifyOperator
+     +                    +     ↓
+Parallel:          MoveToReviewFolder
+ - Index           ←────────────┘
+ - GeneratePreview
+        ↓
+FinalizeProcessing
+```
+
 
 
