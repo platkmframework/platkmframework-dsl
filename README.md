@@ -23,7 +23,7 @@ CPlatkmDSL simplifica la construcción de procesos complejos:
   
 
 ```
-AuthenticationMFA
+Bank Customer Registration
 List<FlowStep<Client>> list  = List.of(
                 new ValidateCustomer(),
                 new VerifyIdentity(),
@@ -53,15 +53,26 @@ fdRunner.run(client);
 ```
 
 ```
-    FlowDefinition<String> p = new FlowDefinition<String>().
-            parallel("searchingStoreInfo",new FlowStepTest("Search Info store 1"), new FlowStepTest("Search Info store 2")).
-            when("exists data", msg -> msg.contains("DATA")).
-                step("processData", new FlowStepTest("Process data")).
-            whenElse("NOT exists data", msg -> !msg.contains("DATA")).
-                step("notify", new FlowStepTest("Notify data not found"))
-            .whenEnd();
+List<FlowStep<Credential>> list  = List.of(
+                new  SendMfaCode(),
+                new ValidateMfaCode(),
+                new SkipMfaStep(),
+                new LoginSuccess());
+FlowDefinitionContext<Credential> context = new FlowDefinitionContext<>(list);
+fdRunner = FlowDefinitionBuilder.
+        builder(context).
+            when(credential -> credential.requiredMFA).
+                step(SendMfaCode.class).
+                step(ValidateMfaCode.class).
+                step(LoginSuccess.class).
+            whenElse(credential -> !credential.requiredMFA).
+                step(SkipMfaStep.class).
+                step(LoginSuccess.class).
+            end().build();
 
-    p.run("DATA");
+Credential credential = new Credential();
+credential.requiredMFA = true;
+fdRunner.run(credential);
 ```
 
 
